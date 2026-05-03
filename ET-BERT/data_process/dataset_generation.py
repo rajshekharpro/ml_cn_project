@@ -500,10 +500,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    pcap_dir = os.path.abspath(os.path.join(BASE_DIR, args.pcap_dir))
+    pcap_dir = os.path.abspath(args.pcap_dir) # Use absolute path directly
 
     if args.pretrain:
-        cpu_count = mp.cpu_count()
+        # Request a specific number of workers to avoid overhead (e.g., 20)
+        cpu_count = min(mp.cpu_count(), 24)
         print(f"Generating pre-training corpus from {pcap_dir} using {cpu_count} CPUs...")
         
         pcap_files = []
@@ -512,9 +513,20 @@ if __name__ == '__main__':
                 if file.endswith('.pcap') or file.endswith('.pcapng'):
                     pcap_files.append(os.path.join(p, file))
         
-        with open(os.path.join(word_dir, word_name), 'w') as out_f:
+        output_file_path = os.path.join(word_dir, word_name)
+        
+        # Using 'a' (append) and a manual counter for flushing
+        with open(output_file_path, 'w', buffering=1) as out_f: # buffering=1 enables line-level buffering
             with mp.Pool(cpu_count) as pool:
-                for burst_txt in tqdm.tqdm(pool.imap_unordered(_pretrain_worker, pcap_files), total=len(pcap_files)):
+                count = 0
+                for burst_txt in tqdm.tqdm(pool.imap_unordered(_pretrain_worker, pcap_files, chunksize=10), total=len(pcap_files)):
                     if burst_txt:
                         out_f.write(burst_txt)
-        print(f"\nDone! Corpus saved to {os.path.join(word_dir, word_name)}")
+                        count += 1
+                        
+                        # FORCE FLUSH every 500 flows to keep RAM usage low
+                        if count % 500 == 0:
+                            out_f.flush()
+                            os.fsync(out_f.fileno()) 
+                            
+        print(f"\nDone! Corpus saved to {output_file_path}")
