@@ -207,6 +207,47 @@ ls -la /scratch/cse/phd/<my_entry_no>/netFound/pre_process_src/3_field_extractio
 
 ### Step 4 — Clone the Evaluation Framework
 
+Step 5: Embedding Generation
+What: Feed the tokenized flows through the pretrained netFound model (frozen weights — no training). For each flow, the model outputs a 1024-dimensional embedding vector — a compact numerical representation capturing the flow's characteristics.
+Why: Instead of raw packet fields, we work with rich semantic representations that the model learned during pretraining on 450M flows.
+Arrow files → netFound model → 236,043 × 1024 embedding matrix
+
+Step 6: Causal Sensitivity Testing
+What: This is the core evaluation. For each protocol field:
+
+Take original flow → get embedding A
+Perturb that field (randomize or reorder values) → get embedding B
+Measure cosine similarity between A and B
+
+Fields tested:
+
+Payload bytes
+SEQ/ACK numbers
+IP Total Length
+IP TTL
+TCP Flags
+TCP Window Size
+
+Two perturbation methods:
+
+Random: Replace field with completely random values
+Reorder: Swap field values between flows in the batch
+
+Result: A sensitivity score per field showing how much the model's understanding changes when that field is altered.
+
+Step 7: Interpretation
+What: Analyze the cosine similarity scores:
+Cosine SimilarityMeaningClose to 1.0Model ignores this fieldClose to 0.0Model heavily relies on this field
+Example finding from the paper:
+
+netFound is highly sensitive to payload (bad — payload is often encrypted)
+netFound is less sensitive to TTL (good — TTL is a routing artifact)
+
+
+What We Found (Your Result)
+The checkpoint has an architecture mismatch — the MLP layers in burst/flow encoders were added in a newer version of the code but absent from the released checkpoint. This caused NaN embeddings, preventing valid sensitivity scores.
+This is itself a reproducibility finding worth reporting — model checkpoints must be paired with the exact code version they were trained with.
+
 ```bash
 cd /scratch/cse/phd/<my_entry_no>/
 
