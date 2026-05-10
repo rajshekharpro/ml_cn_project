@@ -207,7 +207,7 @@ ls -la /scratch/cse/phd/<my_entry_no>/netFound/pre_process_src/3_field_extractio
 
 ### Step 4 — Clone the Evaluation Framework
 
-Step 5: Embedding Generation
+Embedding Generation
 What: Feed the tokenized flows through the pretrained netFound model (frozen weights — no training). For each flow, the model outputs a 1024-dimensional embedding vector — a compact numerical representation capturing the flow's characteristics.
 Why: Instead of raw packet fields, we work with rich semantic representations that the model learned during pretraining on 450M flows.
 Arrow files → netFound model → 236,043 × 1024 embedding matrix
