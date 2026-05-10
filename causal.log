@@ -7,16 +7,26 @@ Loading data...
 Tokenizing...
 
 Generating original embeddings...
-  0%|          | 0/7456 [00:00<?, ?it/s]/scratch/cse/phd/csz258235/envs/netfound/lib/python3.10/site-packages/transformers/modeling_utils.py:1621: FutureWarning: The `device` argument is deprecated and will be removed in v5 of Transformers.
+
+  0%|          | 0/7456 [00:00<?, ?it/s]/scratch/cse/phd/csz258235/envs/netfound/lib/python3.10/site-packages/transformers/modeling_utils.py:1621: FutureWarning: The `device` argument is deprecated and will be removed in v5 of Transformers.
   warnings.warn(
-  0%|          | 1/7456 [00:36<76:06:33, 36.75s/it]  0%|          | 1/7456 [01:09<143:37:17, 69.35s/it]
+
+  0%|          | 1/7456 [00:36<76:06:33, 36.75s/it]
+  0%|          | 1/7456 [01:09<143:37:17, 69.35s/it]
 Original embeddings shape: torch.Size([64, 1024])
 
 --- Payload ---
-  0%|          | 0/7456 [00:00<?, ?it/s]  0%|          | 1/7456 [00:35<72:39:18, 35.08s/it]  0%|          | 1/7456 [01:08<141:58:38, 68.56s/it]
+
+  0%|          | 0/7456 [00:00<?, ?it/s]
+  0%|          | 1/7456 [00:35<72:39:18, 35.08s/it]
+  0%|          | 1/7456 [01:08<141:58:38, 68.56s/it]
 Cosine sim (random):  nan
-  0%|          | 0/7456 [00:00<?, ?it/s]  0%|          | 1/7456 [00:33<70:15:06, 33.92s/it]  0%|          | 1/7456 [01:06<137:33:13, 66.42s/it]
+
+  0%|          | 0/7456 [00:00<?, ?it/s]
+  0%|          | 1/7456 [00:33<70:15:06, 33.92s/it]
+  0%|          | 1/7456 [01:06<137:33:13, 66.42s/it]
 Cosine sim (reorder): nan
 
 --- SEQ/ACK ---
-  0%|          | 0/7456 [00:00<?, ?it/s]
+
+  0%|          | 0/7456 [00:00<?, ?it/s]
