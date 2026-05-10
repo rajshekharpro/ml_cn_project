@@ -144,6 +144,41 @@ ls /scratch/cse/phd/<my_entry_no>/pcapplusplus/bin/PcapSplitter
 
 ### Step 3 — Build NetFound Preprocessing Binaries
 
+Full Preprocessing Pipeline
+Raw Data
+238,821 campus network PCAP files — these are raw packet captures from IITD's campus network traffic.
+
+Step 1: Filtering (1_filter)
+What: Each PCAP is run through a compiled C++ binary that removes invalid/corrupt packets.
+Why: Raw campus captures contain malformed packets, truncated flows, and noise. The filter keeps only valid TCP/UDP flows.
+Result: 238,821 → 238,821 files (most survived filtering)
+
+Step 2: Splitting (2_pcap_splitting.sh + PcapSplitter)
+What: Each filtered PCAP is split into individual connection-level PCAPs — one file per TCP/UDP flow.
+Why: netFound operates on individual flows, not entire captures. A single PCAP can contain thousands of flows.
+Result: 238,821 → 238,617 split directories, each containing one connection PCAP
+
+Step 3: Field Extraction (3_field_extraction)
+What: Another C++ binary reads each flow PCAP and extracts packet-level fields — IP header, TCP/UDP header, payload bytes — into structured .17 files.
+Why: The model needs structured numerical features, not raw bytes.
+Result: 238,617 extracted feature files
+
+Step 4: Tokenization (Tokenize.py + CollectTokensInFiles.py)
+What: Each extracted flow is converted into a sequence of integer tokens that the model understands. Each packet becomes 18 tokens:
+
+5 IP header tokens (length, TTL, flags, etc.)
+7 TCP/UDP header tokens (flags, window size, SEQ/ACK, etc.)
+6 payload tokens
+
+Multiple packets form a burst, multiple bursts form a flow.
+Why: Transformer models need tokenized input, just like NLP models need words converted to token IDs.
+Result: 104,618 Apache Arrow files ready for the model
+
+Final Dataset
+238,821 PCAPs → filter → split → extract → tokenize → 104,618 arrow files
+                                                        (236,043 flow examples)
+Each arrow file contains one tokenized network flow ready to be fed into netFound for embedding generation or training.
+
 NetFound's preprocessing pipeline requires two compiled C++ binaries: `1_filter` and `3_field_extraction`.
 
 ```bash
